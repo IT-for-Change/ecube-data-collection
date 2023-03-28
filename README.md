@@ -1,5 +1,5 @@
 # ecube-data-collection
-KITE ECUBE English Language Lab Data Collection Scripts
+KITE ECUBE English Language Lab Data Collection Tool
 
 ## Contents
 
@@ -15,7 +15,17 @@ KITE ECUBE English Language Lab Data Collection Scripts
 
 ### About
 
-This is the KITE ECUBE English Language Lab (ELL) data collection tool. The tool collects data from the language lab database and filesystem. The objective  is to extract student activity and performance data from the database, and audio content saved to the file system as part of any recording activity in the language lab.
+This is the KITE ECUBE English Language Lab (ELL) data collection tool. Read more about KITE and the ECUBE ELL [here](https://itforchange.net) and [here](https://itforchange.net). 
+
+The ELL is built with Moodle, the popular free and open source Learning Management System (LMS). While the Moodle installation itself is a standard one, the ELL installation process achieves the rather complex feat of installing all of the software dependencies first, including PHP, the Apache webserver and the MySQL database. The ELL installation package is therefore fully self-contained and is installed using a well-oiled installation script.
+
+The Moodle installation is preloaded with student usernames using a standardized naming scheme the incorporates the class, section and individual student roll number values. The teacher role has a similarly standardized username, as does the 'hm' (headmaster / headmistress) role.
+
+The ELL is supported on KITE's own customized Ubuntu distribution KITE OS and on the standard Ubuntu 20.04 distribution. A docker based package is also available [here](https://docker.com) that can of course run anywhere.
+
+### What data is collected?
+
+The tool collects data from the language lab database and filesystem. The objective  is to extract student activity and performance data from the database, and audio content saved to the file system as part of any recording activity in the language lab.
 
 ### Who is this tool intended for
 This script is intended for use by educational organizations that run the KITE ECUBE ELL software. Some technical proficiency is required to ensure the necessary prerequisites are met and to actually execute the tool. The person running the tool should be able to understand the following content and familiar with executing the steps as indicated.
