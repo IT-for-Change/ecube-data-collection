@@ -26,12 +26,12 @@ If you are running the ELL on KITE OS, all software prerequisites should already
 
 You should see an output similar to:
 
-`$python3
+```
 Python 3.8.10 (default, Sep 28 2021, 16:10:42) 
 [GCC 9.3.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 >>> 
-`
+```
 1. The presence of Python 3.8 + on the system. Do this by opening a terminal window and executing the command
 
 2. The ELL is installed under /opt/lampp
