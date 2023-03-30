@@ -22,9 +22,13 @@ This script is intended for use by organizations that run the KITE ECUBE ELL sof
 
 If you are running the ELL on KITE OS, all software prerequisites should already be met. But please do make the following checks just to be sure.
 
-`python3`
+1. The presence of Python 3.8 + on the system. Do this by opening a terminal window and executing the command:
 
-You should see an output similar to:
+```
+python3
+```
+
+You should see output similar to:
 
 ```
 Python 3.8.10 (default, Sep 28 2021, 16:10:42) 
@@ -32,10 +36,23 @@ Python 3.8.10 (default, Sep 28 2021, 16:10:42)
 Type "help", "copyright", "credits" or "license" for more information.
 >>> 
 ```
-1. The presence of Python 3.8 + on the system. Do this by opening a terminal window and executing the command
 
-2. The ELL is installed under /opt/lampp
-3. 
+2. Confirm the ELL is installed under /opt/lampp. Run the command on a new terminal window.
+
+```
+ls /opt/lampp
+```
+
+You should see output similar to:
+
+```
+apache2  cgi-bin       e_cube          error   icons    info   lib64     logs                   manual      mysql  phpmyadmin      README.md     sbin   THIRDPARTY     var
+bin      ctlscript.sh  ecube-files     etc     img      lampp  libexec   man                    modules     pear   proftpd         README-wsrep  share  uninstall      xampp
+build    docs          e-cube_version  htdocs  include  lib    licenses  manager-linux-x64.run  moodledata  php    properties.ini  RELEASENOTES  temp   uninstall.dat
+```
+
+
+4. 
 
 #### 2. Configuration
 #### 3. Information required
