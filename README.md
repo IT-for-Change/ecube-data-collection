@@ -2,19 +2,22 @@
 
 ### About
 
-This is the KITE ECUBE English Language Lab (ELL) data collection tool. Read more about KITE [here](https://kite.kerala.gov.in) and the ECUBE ELL [here](https://ecube.kite.kerala.gov.in). If you are unfamiliar with the technology and the software package, read [this wiki page](https://github.com/IT-for-Change/ecube-data-collection/wiki) first.
+This is the KITE ECUBE English Language Lab (ELL) data collection tool. Read more about KITE [here](https://kite.kerala.gov.in) and the ECUBE ELL [here](https://ecube.kite.kerala.gov.in). If you are unfamiliar with the ELL software technology and its packaging, read [this wiki page](https://github.com/IT-for-Change/ecube-data-collection/wiki) first.
 
+## Who is this tool intended for
+
+This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to use the tool to 1) ensure the necessary prerequisites are met, and 2) actually execute the tool. The person running the tool should be able to understand the rest of the content in this README and able to execute the tasks mentioned.
+
+## KITEOS vs. Docker vs. Ubuntu deployments of the ELL
+
+The ELL can be deployed on a computer in different ways. The largest deployment so far is on [KITE OS](https://kite.kerala.gov.in/KITE/index.php/welcome/downloads). The tool is designed to assume a KITE OS deployment by default, and the tool's default configuration values correspond to KITE OS. This README too reflects the fact, and focuses on KITE OS deployments. If you are using a docker-based deployment on any OS or a plain Ubuntu OS deployment, skip to the section at the bottom for instructions on customizing the tool configuration accordingly.
 
 ## What data is collected by the tool?
 
 * The ELL database, in the form of a mysqldump sql file
 * Audio files (webm/ogg)
 
-All of the collected data is packaged into a single tar.gz file.
-
-## Who is this tool intended for
-
-This script is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to use the tool to 1) ensure the necessary prerequisites are met, and 2) actually execute the tool. The person running the tool should be able to understand the rest of the content in this README and able to execute the tasks mentioned.
+All of the collected data is packaged into a single tar.gz file. The rest of this document
 
 ## Prerequisites
 
