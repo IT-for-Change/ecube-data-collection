@@ -6,13 +6,13 @@ This is the KITE ECUBE English Language Lab (ELL) data collection tool. Read mor
 
 ## Who is this tool intended for
 
-This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to use the tool to 1) ensure the necessary prerequisites are met, and 2) actually execute the tool. The person running the tool should be able to understand the rest of the content in this README and able to execute the tasks mentioned.
+This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to 1) ensure the necessary prerequisites for executing the tool are met, and 2) actually execute the tool. The person running the tool should be able to understand the contents of this README.
 
 ## KITE OS vs. Docker vs. Ubuntu deployments of the ELL
 
 The ELL can be deployed on a computer in different ways - computers can run the ELL on KITE OS, or as a docker container on any OS, or on plain Ubuntu OS. See [here](https://kite.kerala.gov.in/llabdownload.html) for details of supported OS versions. The data collection tool should work on all these flavours, but since the largest deployment of the tool so far is on [KITE OS](https://kite.kerala.gov.in/KITE/index.php/welcome/downloads), the tool is designed to assume a KITE OS deployment by default, and the tool's default configuration values correspond to KITE OS. 
 
-This README too reflects the fact, and focuses on KITE OS deployments. If you are using a docker-based deployment, skip to the docker section [here](https://github.com/IT-for-Change/ecube-data-collection/blob/main/README.md#prerequisites-docker) for instructions on pre-requisites and for customizing the tool's configuration values.
+If you are using a docker-based deployment, instructions on prerequisite steps and changes to the tool's configuration are documented in [this](https://github.com/IT-for-Change/ecube-data-collection/blob/main/README.md#prerequisites-docker) section.
 
 The tool *should* work correctly on plain Ubuntu OS deployments of the ELL if it is configured correctly. The tool has not been tested on a plain Ubuntu deployment.
 
