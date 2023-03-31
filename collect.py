@@ -395,10 +395,3 @@ if __name__ == "__main__":
             return True
         else:
             return False """
-
-#DOC #TODO
-#(ensure default kiteos)
-#run LL
-#open terminal, go to this directory
-#chmod 777 run-collect.sh
-#goto upload dir. upload only the tar gz file (not the directory or any other file or directory)
