@@ -8,9 +8,11 @@ This is the KITE ECUBE English Language Lab (ELL) data collection tool. Read mor
 
 This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to use the tool to 1) ensure the necessary prerequisites are met, and 2) actually execute the tool. The person running the tool should be able to understand the rest of the content in this README and able to execute the tasks mentioned.
 
-## KITEOS vs. Docker vs. Ubuntu deployments of the ELL
+## KITE OS vs. Docker vs. Ubuntu deployments of the ELL
 
-The ELL can be deployed on a computer in different ways. The largest deployment so far is on [KITE OS](https://kite.kerala.gov.in/KITE/index.php/welcome/downloads). The tool is designed to assume a KITE OS deployment by default, and the tool's default configuration values correspond to KITE OS. This README too reflects the fact, and focuses on KITE OS deployments. If you are using a docker-based deployment on any OS or a plain Ubuntu OS deployment, skip to the section at the bottom for instructions on customizing the tool configuration accordingly.
+The ELL can be deployed on a computer in different ways - computers can run the ELL on KITE OS, or as a docker container on any OS, or on plain Ubuntu OS. See [here](https://kite.kerala.gov.in/llabdownload.html) for details of supported OS versions. The data collection tool should work on all these flavours, but since the largest deployment of the tool so far is on [KITE OS](https://kite.kerala.gov.in/KITE/index.php/welcome/downloads), the tool is designed to assume a KITE OS deployment by default, and the tool's default configuration values correspond to KITE OS. 
+
+This README too reflects the fact, and focuses on KITE OS deployments. If you are using a docker-based deployment on any OS or a plain Ubuntu OS deployment, skip to the section at the bottom of this readme for instructions on pre-requisites and for customizing the tool's configuration values.
 
 ## What data is collected by the tool?
 
@@ -21,7 +23,7 @@ All of the collected data is packaged into a single tar.gz file. The rest of thi
 
 ## Prerequisites
 
-#### 1. Software checks
+### 1. Software checks
 
 If you are running the ELL on KITE OS, all software prerequisites should already be met. But please do make the following checks just to be sure.
 
@@ -54,12 +56,18 @@ bin      ctlscript.sh  ecube-files     etc     img      lampp  libexec   man    
 build    docs          e-cube_version  htdocs  include  lib    licenses  manager-linux-x64.run  moodledata  php    properties.ini  RELEASENOTES  temp   uninstall.dat
 ```
 
+### 2. Configuration
 
-4. 
+1. The ELL uses a MySQL database. The tool connects to this database to download data. The configuration parameters to connect to the database are specified in the **collect.conf** file. The values reflect the ELL installation defaults on KITE OS. No action is required if you are running the tool on the default KITE OS setup of the ELL.
+2. The tool assumes the ELL has been installed under the **/opt/lampp/** directory. If you are running ELL on KITE OS, this is the default installation location and no action is required to change anything.
 
-#### 2. Configuration
-#### 3. Information required
 
-###  How to execute the script
-### Reading the logs
-### Upload the data file
+### 3. Mandatory information required by the tool
+
+#### School code
+When you run the tool, it will prompt you to enter a **school code**. This code uniquely identifies your school and associates the collected data with the school. This information is mandatory for the tool to execute. Contact your IT administrator to obtain this information before executing the tool.
+
+
+## How to execute the script
+## Reading the logs
+## Upload the data file
