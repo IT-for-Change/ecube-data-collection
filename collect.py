@@ -371,7 +371,7 @@ def collectMedia(collectConfig):
     csvfile = None
     try:
         logging.debug("Extracting media metadata from local DB")
-        sql =  '''select mdl_user.id, mdl_user.username , mdl_assign.course as course, mdl_assign.id as assignment_id, mdl_assign_submission.attemptnumber, mdl_files.contenthash, mdl_files.pathnamehash 
+        sql =  '''select mdl_user.id, mdl_user.username , mdl_assign.course as course, mdl_assign.id as assignment_id, mdl_assign_submission.attemptnumber, mdl_assign_submission.timecreated, mdl_files.contenthash, mdl_files.pathnamehash 
                 from mdl_assign_submission
                 inner join mdl_assign on mdl_assign.id = mdl_assign_submission.`assignment`
                 inner join mdl_assignsubmission_onlinetext on mdl_assignsubmission_onlinetext.`assignment` = mdl_assign_submission.`assignment`
@@ -401,8 +401,9 @@ def collectMedia(collectConfig):
             course = row[2]
             assignmentId = row[3]
             attemptNumber = row[4]
-            mediaFileContenthash = row[5]
-            mediaFilePathhash = row[6]
+            timecreated = row[5]
+            mediaFileContenthash = row[6]
+            mediaFilePathhash = row[7]
             dir1 = mediaFileContenthash[:2]
             dir2 = mediaFileContenthash[2:4]
             mediaFile = mediaFileContenthash
@@ -413,6 +414,7 @@ def collectMedia(collectConfig):
             csvline.append(course)
             csvline.append(assignmentId)
             csvline.append(attemptNumber)
+            csvline.append(timecreated)
             csvline.append(mediaFile)
             csvlines.append(csvline)
             logging.debug("copying audio file {0}".format(mediaFileFullPath))
