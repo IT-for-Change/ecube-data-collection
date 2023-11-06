@@ -6,15 +6,15 @@ This is the KITE ECUBE English Language Lab (ELL) data collection tool. Read mor
 
 ## Who is this tool intended for
 
-This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to use the tool to 1) ensure the necessary prerequisites are met, and 2) actually execute the tool. The person running the tool should be able to understand the rest of the content in this README and able to execute the tasks mentioned.
+This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to 1) ensure the necessary prerequisites for executing the tool are met, and 2) actually execute the tool. The person running the tool should be able to understand the contents of this README.
 
 ## KITE OS vs. Docker vs. Ubuntu deployments of the ELL
 
 The ELL can be deployed on a computer in different ways - computers can run the ELL on KITE OS, or as a docker container on any OS, or on plain Ubuntu OS. See [here](https://kite.kerala.gov.in/llabdownload.html) for details of supported OS versions. The data collection tool should work on all these flavours, but since the largest deployment of the tool so far is on [KITE OS](https://kite.kerala.gov.in/KITE/index.php/welcome/downloads), the tool is designed to assume a KITE OS deployment by default, and the tool's default configuration values correspond to KITE OS. 
 
-This README too reflects the fact, and focuses on KITE OS deployments. If you are using a docker-based deployment, skip to the section here for instructions on pre-requisites and for customizing the tool's configuration values.
+If you are using a docker-based deployment, instructions on prerequisite steps and changes to the tool's configuration are documented in [this](https://github.com/IT-for-Change/ecube-data-collection/blob/main/README.md#prerequisites-docker) section.
 
-The tool should work correctly on plain Ubuntu OS deployments of the ELL if it is configured correctly. The tool has not been tested on a plain Ubuntu deployment.
+The tool *should* work correctly on plain Ubuntu OS deployments of the ELL if it is configured correctly. The tool has not been tested on a plain Ubuntu deployment.
 
 ## What data is collected by the tool?
 
@@ -73,7 +73,65 @@ When you run the tool, it will prompt you to enter a **school code**. This code 
 
 ## Prerequisites (DOCKER)
 
-TBD
+### 1. Software / Hardware checks
+
+If you are running the ELL as a docker container, the computer in which the container is running should meet the following prerequisites.
+
+1. Python 3.8 (or higher version). Check this by opening a terminal window and executing the command:
+
+```
+python3
+```
+
+You should see output similar to:
+
+```
+Python 3.8.10 (default, Sep 28 2021, 16:10:42) 
+[GCC 9.3.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+```
+
+2. MySQL client tools with the `mysqldump` tool should be installed. This should be a version compatible with Maria DB 10.
+
+3. Note dowm the location of the `mysqldump` executable
+
+4. Ensure there is sufficient hard-disk space on the computer. The actual space required depends on the usage of the ELL on that computer. To be on the safer side, ensure there is at least 500 MB of space on the computer.
+
+### 2. Configuration
+
+The ELL docker image contains a MySQL database installation. The tool connects to this database to download data. The configuration parameters to connect to the database are specified in the **collect.conf** file. Since the default values reflect the ELL installation on KITE OS, you need to change the following values in **collect.conf** to successfully execute the tool.
+
+1. change the `ecube.setuptype` from `kiteos` to `docker`. Like this:
+
+```
+[ECUBE]
+ecube.setuptype = kiteos
+```
+
+2. Provide the full path to the mysqldump executable under the [DOCKER] section.
+
+For example,
+```
+mysqldump.bin = /usr/bin/mysqldump
+```
+3. Update the following database values to match the values in your docker image's compose file. 
+
+For example,
+```
+mysql.db = moodle
+mysql.user = root
+mysql.password = rootpassword
+mysql.host = localhost
+mysql.port = 42333
+moodle.data = /home/me/ecube_docker/ecube_moodle/moodledata
+```
+
+### 3. Mandatory information required by the tool
+
+#### School code
+When you run the tool, it will prompt you to enter a **school code**. This code uniquely identifies your school and associates the collected data with the school. This information is mandatory for the tool to execute. Contact your IT administrator to obtain this information before executing the tool.
+
 
 ## Are you ready to execute the tool?
 
