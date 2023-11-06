@@ -6,7 +6,11 @@ This is the KITE ECUBE English Language Lab (ELL) data collection tool. Read mor
 
 ## Who is this tool intended for
 
-This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to 1) ensure the necessary prerequisites for executing the tool are met, and 2) actually execute the tool. The person running the tool should be able to understand the contents of this README.
+This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. 
+
+Some technical proficiency is required to 
+* ensure the necessary prerequisites for executing the tool are met, and
+* actually execute the tool. The person running the tool should be able to follow the contents of this README and act accordingly.
 
 ## KITE OS vs. Docker vs. Ubuntu deployments of the ELL
 
@@ -73,8 +77,8 @@ build    docs          e-cube_version  htdocs  include  lib    licenses  manager
 
 ### 2. Configuration
 
-1. The ELL uses a MySQL database. The tool connects to this database to download data. The configuration parameters to connect to the database are specified in the **collect.conf** file. The values reflect the ELL installation defaults on KITE OS. No action is required if you are running the tool on the default KITE OS setup of the ELL.
-2. The tool assumes the ELL has been installed under the **/opt/lampp/** directory. If you are running ELL on KITE OS, this is the default installation location and no action is required to change anything.
+1. The ELL uses a MySQL database. The tool connects to this database to download data. The configuration parameters to connect to the database are specified in the **collect.conf** file. The values reflect the ELL installation defaults on KITE OS. **No action is required if you are running the tool on the default KITE OS setup of the ELL**.
+2. The tool assumes the ELL has been installed under the **/opt/lampp/** directory. If you are running ELL on KITE OS, this is the default installation location. **No action is required if you are running the tool on the default KITE OS setup of the ELL**.
 
 
 ### 3. Mandatory information required by the tool
@@ -117,7 +121,7 @@ The ELL docker image contains a MySQL database installation. The tool connects t
 
 ```
 [ECUBE]
-ecube.setuptype = kiteos
+ecube.setuptype = docker
 ```
 
 2. Provide the full path to the mysqldump executable under the [DOCKER] section.
