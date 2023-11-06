@@ -189,6 +189,13 @@ $./run-collect.sh
 27/03/2023 08:08:07 AM - INFO: Data collection complete.
 27/03/2023 08:08:07 AM - INFO: Upload the file 'dfdc1e57-f828-4789-8506-974e06ec6664.tar.gz' as instructed
 ```
+## Upload the data file
+
+**TBD** screenshot of directories. mark out those that need to be uploaded.
+
+Open the file explorer and navigate to the tool location under your home directory. The data package file (.tar.gz) will be available under the **uploads** directory. 
+
+Upload the file as instructured. **DO NOT** upload the 'upload' directory itself. Upload **ONLY** the .tar.gz file! **DO NOT** upload anything else from the tool directory. The .tar.gz file has everything that is needed!
 
 ## Troubleshooting
 
@@ -206,12 +213,6 @@ If you are unable to resolve the problem yourself, report the issue to your desi
 | 1006      | The tool was not able to successfully generate a completion report file| Check the available disk space on the computer or for any other errors.|
 | 1007      | The tool was not able to process the extracted audio file metadata elements or copy over an individual audio file from the ELL. | Check the available disk space on the computer or for any other errors.|
 | 9999      | Some unforeseen error occurred during execution| Report it to your designated IT team contact with a screenshot of the terminal window and a copy of the log file from the **log** directory|
-
-## Upload the data file
-
-Open the file explorer and navigate to the tool location under your home directory. The data package file (.tar.gz) will be available under the **uploads** directory. 
-
-Upload the file as instructured. **DO NOT** upload the 'upload' directory itself. Upload **ONLY** the .tar.gz file! **DO NOT** upload anything else from the tool directory. The .tar.gz file has everything that is needed!
 
 ## Uninstalling the tool
 
