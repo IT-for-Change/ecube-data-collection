@@ -5,16 +5,25 @@ from subprocess import Popen, PIPE, STDOUT, CalledProcessError
 import xml.etree.ElementTree as ET
 import os.path
 from pathlib import Path
+import sqlite3
 import shutil
 import configparser
 from time import time
+import csv
+import traceback
 
-APP_VERSION = '1.0.0'
+APP_VERSION = '2.0.0'
+ECUBE_COLLECT_SCOPE_FULL = 'all'
+ECUBE_COLLECT_SCOPE_AUDIO = 'audio'
+ECUBE_COLLECT_DB = 'ell-collect.db'
 
 #KITE OS based ECUBE is the default; the value is also set in the conf file
 #It can take values 'kiteos' or 'docker'
 class CollectConfiguration:
         ecubeSetupType = 'kiteos'
+        ecubeCollectScope = ECUBE_COLLECT_SCOPE_AUDIO
+        ecubeTables = ''
+        ecubeLocalDB = ''
         mysqldumpbin = ''
         mysqldb = ''
         mysqluser = ''
@@ -62,8 +71,19 @@ def loadConfig():
     else:
         configSection = 'KITEOS'
 
+    ecubeCollectScope = config['ECUBE']['ecube.collectscope']
+    if (ecubeCollectScope == None or ecubeCollectScope == ""):
+        ecubeCollectScope = ECUBE_COLLECT_SCOPE_AUDIO
+
+    ecubeLocalDB = config['ECUBE']['ecube.localdb']
+    if (ecubeLocalDB == None or ecubeLocalDB == ""):
+        ecubeLocalDB = ECUBE_COLLECT_DB
+
     collectConfig = CollectConfiguration()
     collectConfig.ecubeSetupType = ecubeSetupType
+    collectConfig.ecubeCollectScope = ecubeCollectScope
+    collectConfig.ecubeLocalDB = collectConfig.tmpDir + ECUBE_COLLECT_DB
+    collectConfig.ecubeTables = config['ECUBE']['ecube.tables']
     collectConfig.mysqldumpbin = config[configSection]['mysqldump.bin']
     collectConfig.mysqldb = config[configSection]['mysql.db']
     collectConfig.mysqluser = config[configSection]['mysql.user']
@@ -73,7 +93,6 @@ def loadConfig():
     collectConfig.moodledata = config[configSection]['moodle.data']
 
     return collectConfig
-    
     
 def confirmContinue(collectConfig):
     if (os.path.exists(collectConfig.dataDir)):
@@ -104,7 +123,9 @@ def clearAndCreateDirs(collectConfig):
     if (os.path.exists(dataDir)): 
         shutil.rmtree(dataDir)
 
-    Path(dbDir).mkdir(parents=True)
+    if (collectConfig.ecubeCollectScope == ECUBE_COLLECT_SCOPE_FULL):
+        Path(dbDir).mkdir(parents=True)
+    
     Path(audiodataDir).mkdir(parents=True)
 
     if (os.path.exists(uploadDir)): 
@@ -137,6 +158,8 @@ def initLogging(collectConfig):
 
     logging.info('Logging initialized. Starting data collection with id {}'.format(collectConfig.id))
     logging.debug('Configuration ' + collectConfig.ecubeSetupType + ' | ' + \
+        collectConfig.ecubeCollectScope + ' | ' + \
+        collectConfig.ecubeLocalDB + ' | ' + \
         collectConfig.mysqldumpbin + ' | ' + \
         collectConfig.mysqldb + ' | ' + \
         collectConfig.mysqlhost + ' | ' + \
@@ -195,8 +218,8 @@ def runProcess(cmd):
             logging.debug('Command executed successfully')
             return True
 
-def dumpDB(collectConfig):
-    logging.info("Collecting data from the database")
+def dumpELLDB(collectConfig):
+    logging.info("Dumping data from the ELL database for FULL collect scope")
     cmd = ''
     cmd = \
         collectConfig.mysqldumpbin + ' ' + \
@@ -223,12 +246,13 @@ def dumpDB(collectConfig):
     if (execStatus == False):
         raise DataCollectionError("1001")
 
-    logging.info("Collected data from the database successfully")
+    logging.info("Dumped data from the database successfully")
     return execStatus
     
 
-def dumpXMLTables(collectConfig):
-    logging.info("Collected data from XML tables")
+def exportTablesToXML(collectConfig):
+    logging.info("Collecting data from XML tables")
+    logging.debug('Database tables {}'.format(collectConfig.ecubeTables))
     cmd = ''
     cmd = \
         collectConfig.mysqldumpbin + ' ' + \
@@ -248,7 +272,8 @@ def dumpXMLTables(collectConfig):
         ' ' + \
         '--xml' + ' ' + \
         collectConfig.mysqldb + ' ' + \
-        'mdl_files mdl_assign_submission mdl_user ' + \
+        collectConfig.ecubeTables + \
+        ' ' + \
         '>' + ' ' + \
         collectConfig.moodleMediaTableDataFile
     
@@ -258,72 +283,164 @@ def dumpXMLTables(collectConfig):
         raise DataCollectionError("1002")
     logging.info('Completed XML table dump successfully')
     return execStatus
+
+def setupLocalDB(collectConfig):
+
+    db = sqlite3.connect(collectConfig.ecubeLocalDB)
+
+    tables = collectConfig.ecubeTables.split(' ')
+
+    doc = ET.parse(collectConfig.moodleMediaTableDataFile).getroot()  # Parse XML
+
+    for table in tables:
+        table_structure = doc.find("./database/table_structure/[@name='" + table + "']")
+        table_fields = table_structure.findall('field')
+
+        create_table_sql = 'create table if not exists ' + table     + ' ('
+
+        for table_field in table_fields:
+            table_column = table_field.attrib['Field']
+            create_table_sql += table_column + ' TEXT,'
     
+        create_table_sql = create_table_sql.rstrip(',')
+        create_table_sql += ' );'
+        logging.debug('Creating local table {} with SQL {}'.format(table, create_table_sql))
+        db.execute(create_table_sql)
+    return
+
+def populateLocalDB(collectConfig):
+
+    db = sqlite3.connect(collectConfig.ecubeLocalDB)
+
+    tables = collectConfig.ecubeTables.split(' ')
+
+    doc = ET.parse(collectConfig.moodleMediaTableDataFile).getroot()  # Parse XML
+
+    for table in tables:
+        
+        table_structure = doc.find("./database/table_structure/[@name='" + table + "']")
+        table_fields = table_structure.findall('field')
+        
+        table_insert_sql = 'insert into ' + table + '('
+        for table_field in table_fields:
+            table_column = table_field.attrib['Field']
+            table_insert_sql += table_column + ','
+
+        table_insert_sql = table_insert_sql.rstrip(',')
+        table_insert_sql += ' ) values ('
+
+        for table_field in table_fields:
+            table_insert_sql += '?,'
+
+        table_insert_sql = table_insert_sql.rstrip(',')
+        table_insert_sql += ')'
+
+        table_data = doc.find("./database/table_data/[@name='" + table + "']")
+
+        data_rows = table_data.findall('row')
+        rows_to_insert = []
+
+        for data_row in data_rows:
+            data_fields = list(data_row)
+            row_to_insert = []
+            for data_field in data_fields:
+                if (data_field.text == None):
+                    data_field.text = ''
+                row_to_insert.append(data_field.text)
+            rows_to_insert.append(row_to_insert)
+
+        logging.debug("Populating table {} with data using SQL {}".format(table,table_insert_sql))
+        db.executemany(table_insert_sql,rows_to_insert)
+        db.commit()
+
+    db.close()
+
+    return
+    
+def extractMediaMetadataFromXML(collectConfig):
+    setupLocalDB(collectConfig)
+    populateLocalDB(collectConfig)
+    return
+
 def collectMedia(collectConfig):
     
     logging.info("Starting media collection")
-    logging.debug("Reading file " + collectConfig.moodleMediaTableDataFile)
-    root = None
+    logging.debug("Reading local db " + collectConfig.ecubeLocalDB)
+    
+    db = None
+    csvfile = None
     try:
-        logging.debug("Parsing XML file")
-        tree = ET.parse(collectConfig.moodleMediaTableDataFile)
-        root = tree.getroot()
+        logging.debug("Extracting media metadata from local DB")
+        sql =  '''select mdl_user.id, mdl_user.username , mdl_assign.course as course, mdl_assign.id as assignment_id, mdl_assign_submission.attemptnumber, mdl_files.contenthash, mdl_files.pathnamehash 
+                from mdl_assign_submission
+                inner join mdl_assign on mdl_assign.id = mdl_assign_submission.`assignment`
+                inner join mdl_assignsubmission_onlinetext on mdl_assignsubmission_onlinetext.`assignment` = mdl_assign_submission.`assignment`
+                inner join mdl_user on mdl_user.id = mdl_assign_submission.userid
+                inner join mdl_files on mdl_files.itemid = mdl_assignsubmission_onlinetext.submission 
+                where mdl_assign_submission.status ='submitted' and (mdl_files.mimetype like 'audio%' or mdl_files.mimetype like 'video%');
+            '''
+
+        db = sqlite3.connect(collectConfig.ecubeLocalDB)
+        cursor = db.execute(sql)
+        logging.debug("Local db read complete")
+        logging.info("Finished reading media records from database. Saving metadata CSV and copying audio files")
+
+        logging.debug("Creating csv file")
+        csvfilename = collectConfig.dataDir + collectConfig.id + '.csv'
+        csvfile = open(csvfilename, 'w',newline='')
+        logging.debug("Opened csv file {}".format(csvfilename))
+        csvfilewriter = csv.writer(csvfile,delimiter=',')
+        csvlines = []
+        line_count = 0
+        logging.debug("Looping through local DB media records and generating csv lines")
+        
+        for row in cursor:
+            line_count += 1
+            userid = row[0]
+            username = row[1]
+            course = row[2]
+            assignmentId = row[3]
+            attemptNumber = row[4]
+            mediaFileContenthash = row[5]
+            mediaFilePathhash = row[6]
+            dir1 = mediaFileContenthash[:2]
+            dir2 = mediaFileContenthash[2:4]
+            mediaFile = mediaFileContenthash
+            mediaFileFullPath = collectConfig.moodledata + "/filedir" + "/" + str(dir1) + "/" + str(dir2) + "/" + mediaFileContenthash
+            csvline = []
+            csvline.append(userid)
+            csvline.append(username)
+            csvline.append(course)
+            csvline.append(assignmentId)
+            csvline.append(attemptNumber)
+            csvline.append(mediaFile)
+            csvlines.append(csvline)
+            logging.debug("copying audio file {0}".format(mediaFileFullPath))
+            shutil.copy2(mediaFileFullPath,collectConfig.audiodataDir)
+            logging.debug("Copied")
+
+        logging.debug("Writing {} records to CSV".format(line_count))
+        csvfilewriter.writerows(csvlines)
+        logging.info("Saved media metadata CSV and copied audio files successfully")
     except Exception as ex:
-        logging.debug("XML parsing failed")
+        logging.debug("Reading media metadata from local db failed")
         logging.debug(ex)
         raise DataCollectionError("1003")
     else:
-        logging.debug("XML parsed successfully")
-    #xpath = "./database/table_data/row/field/[@name='mimetype']"
-    filedir = collectConfig.moodledata + "/filedir"
-    logging.info("Loaded media metadata successfully")
-    # The logic below is simply equivalent to the SQL: 
-    # ---
-    # select * from mdl_files where mimetype in ('audio/ogg','video/webm') 
-    # and userid in (select distinct userid from mdl_assign_submission where status='submitted');
-    # ---
-    # We cannot run an SQL due to the constraint we cannot connect to the ELL MySQL because it requires a python-mysql connector that is not part of the standard python package installed 
-    # on the ELL workstation. To workaround, we are dumping the required database tables as xml files and parsing the xml 
-    # to extract the information that would otherwise have been obtained by running the above SQL
+        logging.debug("Finished reading media metadata from local db successfully")
+    finally:
+        db.close()
+        csvfile.close()
 
-    logging.info("Extracting audio data")
-
-    try:
-        users = []
-        assignmentSubmissionsXpath = "./database/table_data/[@name='mdl_assign_submission']/row"
-        for assignmentSubmissionRecord in root.findall(assignmentSubmissionsXpath):
-            submissionStatus = assignmentSubmissionRecord.find("field/[@name='status']")
-            userid = assignmentSubmissionRecord.find("field/[@name='userid']")
-            if (submissionStatus.text == 'submitted'):
-                users.append(userid.text)
-
-        logging.debug("Found {} students who have submitted audio activities".format(len(users)))
-
-        mediaRecordXpath = "./database/table_data/[@name='mdl_files']/row"
-        mediaRecords = root.findall(mediaRecordXpath)
-        audioFileCounter = 0
-        for mediaRecord in mediaRecords:
-            userid = mediaRecord.find("field/[@name='userid']").text
-            filearea = mediaRecord.find("field/[@name='filearea']").text
-            if (userid in users):
-                mimetype = mediaRecord.find("field/[@name='mimetype']")
-                if ((mimetype.text in collectConfig.allowedMediaTypes) and (filearea == 'submissions_onlinetext')) :
-                    audioFileCounter = audioFileCounter+1
-                    contenthash = mediaRecord.find("field/[@name='contenthash']").text
-                    component = mediaRecord.find("field/[@name='component']").text
-                    id = mediaRecord.find("field/[@name='id']").text
-                    dir1 = contenthash[:2]
-                    dir2 = contenthash[2:4]
-                    mediaFile = filedir + "/" + str(dir1) + "/" + str(dir2) + "/" + contenthash
-                    #print(userid + "," + mediaFile)
-                    shutil.copy2(mediaFile,collectConfig.audiodataDir)
-        logging.debug("Found and collected {} media files".format(audioFileCounter))
-    except Exception as err:
-        logging.debug("Extracting audio submission data failed")
-        logging.debug(err)
-        raise DataCollectionError("1007")
+    #TODO: Mimetype check????
     
-    logging.info("Extracted audio data successfully")
+    #logging.info("Extracting audio data")
+    #logging.debug("Found {} students who have submitted audio activities".format(len(users)))
+    #logging.debug("Found and collected {} media files".format(audioFileCounter))
+    #except Exception as err:
+     #   logging.debug("Extracting audio submission data failed")
+      #  logging.debug(err)
+       # raise DataCollectionError("1007")
 
 def packageData(collectConfig):
 
@@ -357,8 +474,18 @@ def saveReport(startTime, id, schoolCode, logDir):
         raise DataCollectionError("1006")
     logging.info("Run report created successfully")
 
+def logError(e,err=None):
+    if (err != None):
+        logging.error(err)
+    logging.error("Error in data collection. Error code " + e.code)
+    logging.error("Report the error code to the technical team along with the log files in the 'log' directory")
+    logging.debug(''.join(traceback.format_exc()))
+
 if __name__ == "__main__":
     
+    collectConfig = None
+    completedWithErrors = False
+
     try:
         print("\nLaunching version " + APP_VERSION + " of the KITE ECUBE Data Collection Tool")
         startTime = int(time() * 1000)
@@ -369,29 +496,33 @@ if __name__ == "__main__":
         schoolCode = getSchoolCode()
         if (confirmContinue(collectConfig) == True):
             clearAndCreateDirs(collectConfig)
-            dumpDB(collectConfig)
-            dumpXMLTables(collectConfig)
+            if (collectConfig.ecubeCollectScope == ECUBE_COLLECT_SCOPE_FULL):
+                dumpELLDB(collectConfig)
+            exportTablesToXML(collectConfig)
+            extractMediaMetadataFromXML(collectConfig)
             collectMedia(collectConfig)
             saveReport(startTime, collectConfig.id, schoolCode, collectConfig.logDir)
             packageData(collectConfig)
-            logging.info("Data collection complete.")
-            logging.info("Upload the file '" + collectConfig.tarfile + "' as instructed")
         else:
             logging.info("Exiting without collecting data")
+            exit()
     except DataCollectionError as e:
-        logging.error("Error in data collection. Error code " + e.code)
-        logging.info("Report the error code to the technical team along with the log files in the 'log' directory")
+        logError(e)
+        completedWithErrors = True
     except Exception as err:
-        logging.error(err)
-        logging.error("Error in data collection. Error code 9999")
-        logging.info("Report the error code to the technical team along with the log files in the 'log' directory")
-    exit()
-
-""" def isUseridMediaFileCreator(root,userid):
-    userRecordXpath = "./database/table_data/[@name='mdl_user']/row"
-    for userRecord in root.findall(userRecordXpath):
-        id = userRecord.find("field/[@name='id']").text
-        if (id == userid):
-            return True
+        e = DataCollectionError('9999')
+        print(err) # in case logging is not yet initialized
+        logError(e,err)
+        completedWithErrors = True
+    finally:
+        if (completedWithErrors == True):
+            logging.info("Data collection completed with errors.")
         else:
-            return False """
+            logging.info("Data collection completed successfully.")
+            logging.info("Upload the file '" + collectConfig.tarfile + "' as instructed")
+#DOC #TODO
+#(ensure default kiteos)
+#run LL
+#open terminal, go to this directory
+#chmod 777 run-collect.sh
+#goto upload dir. upload only the tar gz file (not the directory or any other file or directory)
