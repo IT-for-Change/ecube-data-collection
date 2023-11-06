@@ -22,10 +22,10 @@ The data collected by the tool depends on the scope you define for it in the con
 
 When the scope is set as `all`, the tool collects
 * The entire ELL database, in the form of a mysqldump sql file
-* Audio files (webm/ogg)
+* Audio files (webm/ogg) from audio activity submissions
 
 When the scope is set as `audio`, the tool collects
-* Audio files (webm/ogg)
+* Audio files (webm/ogg) from audio activity submissions
 * Metadata for each audio activity submission
     * the userid of the student who submitted the audio,
     * the unique id for the audio activity in the ELL,
