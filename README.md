@@ -18,7 +18,7 @@ The tool *should* work correctly on plain Ubuntu OS deployments of the ELL if it
 
 ## What data is collected by the tool?
 
-The data collected by the tool depends on the scope you define for it in the configuration. The tool supports two scopes - `audio` and `all`.
+The data collected by the tool depends on the scope you define for it in the configuration. The tool supports two scopes - `audio` and `all`. The default setting for the tool is `audio`, specified as `ecube.collectscope = audio` in the configuration.
 
 When the scope is set as `all`, the tool collects
 * The entire ELL database, in the form of a mysqldump sql file
@@ -31,8 +31,6 @@ When the scope is set as `audio`, the tool collects
     * the unique id for the audio activity in the ELL,
     * the id of the course to which the activity belongs,
     * the audio file name
-
-The default setting for the tool is `audio`, specified as `ecube.collectscope = audio` in the configuration.
 
 All of the collected data is packaged into a single tar.gz file.
 
