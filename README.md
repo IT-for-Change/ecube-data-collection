@@ -29,6 +29,7 @@ When the scope is set as `audio`, the tool collects
 * Corresponding audio activity metadata from the ELL (the userid of the student who submitted the audio, the audio activity id in the ELL, the course to which the activity belongs, the file name
 
 The default is `audio` only, specified as `ecube.collectscope = audio` in `collect.conf`.
+
 All of the collected data is packaged into a single tar.gz file.
 
 ## Prerequisites (KITE OS)
