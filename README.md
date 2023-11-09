@@ -189,17 +189,31 @@ $./run-collect.sh
 27/03/2023 08:08:07 AM - INFO: Data collection complete.
 27/03/2023 08:08:07 AM - INFO: Upload the file 'dfdc1e57-f828-4789-8506-974e06ec6664.tar.gz' as instructed
 ```
-## Upload the data file
+## Uploading the data file
 
-**TBD** screenshot of directories. mark out those that need to be uploaded.
+Before you upload the collected data,
 
-Open the file explorer and navigate to the tool location under your home directory. The data package file (.tar.gz) will be available under the **uploads** directory. 
+1. Confirm the tool has not encountered any errors by checking for any messages that is marked "ERROR: " in the console. If you closed the terminal window already, repeat the execution (nothing will go wrong when you re-execute!)
+2. If the tool has executed successfully, one of the last log entries on the terminal window will be ```INFO: Data collection completed successfully.```
+3. Then, Open the file explorer and navigate to the tool location under your home directory. The data package file (.tar.gz) will be available under the **upload** directory. Upload only the tar.gz file inside this directory. See the directory structure below. Upload **ONLY** the tar.gz file as indicated, nothing else.
+4. Upload the file to a location as instructed by your designated IT team contact.
 
-Upload the file as instructured. **DO NOT** upload the 'upload' directory itself. Upload **ONLY** the .tar.gz file! **DO NOT** upload anything else from the tool directory. The .tar.gz file has everything that is needed!
+```
+├── collect.conf
+├── collect.py
+├── LICENSE
+├── log
+│   ├── b1507daa-05f1-4944-b432-029f7b14b435.log
+│   └── b1507daa-05f1-4944-b432-029f7b14b435.txt
+├── README.md
+├── run-collect.sh
+└── upload
+    └── b1507daa-05f1-4944-b432-029f7b14b435.tar.gz    ----------> **UPLOAD ONLY THIS ONE TAR.GZ FILE**
+```
 
 ## Troubleshooting
 
-If the tool does not complete successfully, it will print an error code in the terminal log. Refer the error code table below and take action accordingly. Additional informational and debug messages are written to the log file in the tool's **log** directory. 
+If the tool does not complete successfully, it will print an error message and an code in the terminal log. Refer the error code table below and take action accordingly. Additional informational and debug messages are written to the log file in the tool's **log** directory.
 
 If you are unable to resolve the problem yourself, report the issue to your designated IT team contact with a screenshot of the error on the terminal and a copy of the log file.
 
