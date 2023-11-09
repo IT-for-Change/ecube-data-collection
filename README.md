@@ -6,7 +6,11 @@ This is the KITE ECUBE English Language Lab (ELL) data collection tool. Read mor
 
 ## Who is this tool intended for
 
-This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. Some technical proficiency is required to 1) ensure the necessary prerequisites for executing the tool are met, and 2) actually execute the tool. The person running the tool should be able to understand the contents of this README.
+This tool is intended for use by organizations that run the KITE ECUBE ELL software and interested in analyzing student engagement and performance data. 
+
+Some technical proficiency is required to 
+* ensure the necessary prerequisites for executing the tool are met, and
+* actually execute the tool. The person running the tool should be able to follow the contents of this README and act accordingly.
 
 ## KITE OS vs. Docker vs. Ubuntu deployments of the ELL
 
@@ -18,8 +22,19 @@ The tool *should* work correctly on plain Ubuntu OS deployments of the ELL if it
 
 ## What data is collected by the tool?
 
-* The ELL database, in the form of a mysqldump sql file
-* Audio files (webm/ogg)
+The data collected by the tool depends on the scope you define for it in the configuration. The tool supports two scopes - `audio` and `all`. The default setting for the tool is `audio`, specified as `ecube.collectscope = audio` in the configuration.
+
+When the scope is set as `all`, the tool collects
+* The entire ELL database, in the form of a mysqldump sql file
+* Audio files (webm/ogg) from audio activity submissions
+
+When the scope is set as `audio`, the tool collects
+* Audio files (webm/ogg) from audio activity submissions
+* Metadata for each audio activity submission
+    * the userid of the student who submitted the audio,
+    * the unique id for the audio activity in the ELL,
+    * the id of the course to which the activity belongs,
+    * the audio file name
 
 All of the collected data is packaged into a single tar.gz file.
 
@@ -62,8 +77,8 @@ build    docs          e-cube_version  htdocs  include  lib    licenses  manager
 
 ### 2. Configuration
 
-1. The ELL uses a MySQL database. The tool connects to this database to download data. The configuration parameters to connect to the database are specified in the **collect.conf** file. The values reflect the ELL installation defaults on KITE OS. No action is required if you are running the tool on the default KITE OS setup of the ELL.
-2. The tool assumes the ELL has been installed under the **/opt/lampp/** directory. If you are running ELL on KITE OS, this is the default installation location and no action is required to change anything.
+1. The ELL uses a MySQL database. The tool connects to this database to download data. The configuration parameters to connect to the database are specified in the **collect.conf** file. The values reflect the ELL installation defaults on KITE OS. **No action is required if you are running the tool on the default KITE OS setup of the ELL**.
+2. The tool assumes the ELL has been installed under the **/opt/lampp/** directory. If you are running ELL on KITE OS, this is the default installation location. **No action is required if you are running the tool on the default KITE OS setup of the ELL**.
 
 
 ### 3. Mandatory information required by the tool
@@ -106,7 +121,7 @@ The ELL docker image contains a MySQL database installation. The tool connects t
 
 ```
 [ECUBE]
-ecube.setuptype = kiteos
+ecube.setuptype = docker
 ```
 
 2. Provide the full path to the mysqldump executable under the [DOCKER] section.
@@ -174,10 +189,31 @@ $./run-collect.sh
 27/03/2023 08:08:07 AM - INFO: Data collection complete.
 27/03/2023 08:08:07 AM - INFO: Upload the file 'dfdc1e57-f828-4789-8506-974e06ec6664.tar.gz' as instructed
 ```
+## Uploading the data file
+
+Before you upload the collected data,
+
+1. Confirm the tool has not encountered any errors by checking for any messages that is marked "ERROR: " in the console. If you closed the terminal window already, repeat the execution (nothing will go wrong when you re-execute!)
+2. If the tool has executed successfully, one of the last log entries on the terminal window will be ```INFO: Data collection completed successfully.```
+3. Then, Open the file explorer and navigate to the tool location under your home directory. The data package file (.tar.gz) will be available under the **upload** directory. Upload only the tar.gz file inside this directory. See the directory structure below. Upload **ONLY** the tar.gz file as indicated, nothing else.
+4. Upload the file to a location as instructed by your designated IT team contact.
+
+```
+├── collect.conf
+├── collect.py
+├── LICENSE
+├── log
+│   ├── b1507daa-05f1-4944-b432-029f7b14b435.log
+│   └── b1507daa-05f1-4944-b432-029f7b14b435.txt
+├── README.md
+├── run-collect.sh
+└── upload
+    └── b1507daa-05f1-4944-b432-029f7b14b435.tar.gz    ----------> **UPLOAD ONLY THIS ONE TAR.GZ FILE**
+```
 
 ## Troubleshooting
 
-If the tool does not complete successfully, it will print an error code in the terminal log. Refer the error code table below and take action accordingly. Additional informational and debug messages are written to the log file in the tool's **log** directory. 
+If the tool does not complete successfully, it will print an error message and an code in the terminal log. Refer the error code table below and take action accordingly. Additional informational and debug messages are written to the log file in the tool's **log** directory.
 
 If you are unable to resolve the problem yourself, report the issue to your designated IT team contact with a screenshot of the error on the terminal and a copy of the log file.
 
@@ -191,12 +227,6 @@ If you are unable to resolve the problem yourself, report the issue to your desi
 | 1006      | The tool was not able to successfully generate a completion report file| Check the available disk space on the computer or for any other errors.|
 | 1007      | The tool was not able to process the extracted audio file metadata elements or copy over an individual audio file from the ELL. | Check the available disk space on the computer or for any other errors.|
 | 9999      | Some unforeseen error occurred during execution| Report it to your designated IT team contact with a screenshot of the terminal window and a copy of the log file from the **log** directory|
-
-## Upload the data file
-
-Open the file explorer and navigate to the tool location under your home directory. The data package file (.tar.gz) will be available under the **uploads** directory. 
-
-Upload the file as instructured. **DO NOT** upload the 'upload' directory itself. Upload **ONLY** the .tar.gz file! **DO NOT** upload anything else from the tool directory. The .tar.gz file has everything that is needed!
 
 ## Uninstalling the tool
 
