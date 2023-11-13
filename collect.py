@@ -358,8 +358,10 @@ def populateLocalDB(collectConfig):
     return
     
 def extractMediaMetadataFromXML(collectConfig):
+    logging.info("Extracting media metadata")
     setupLocalDB(collectConfig)
     populateLocalDB(collectConfig)
+    logging.info("Media metadata extracted successfully")
     return
 
 def collectMedia(collectConfig):
