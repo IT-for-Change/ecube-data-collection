@@ -201,7 +201,7 @@ def runProcess(cmd):
     
     try:
         logging.debug('Executing command "' + cmd + '"')
-        p = Popen(cmd, stdout=PIPE, stderr=PIPE, text='utf-8',shell=True)
+        p = Popen(cmd, stdout=PIPE, stderr=PIPE, encoding='utf-8',shell=True)
         out, err = p.communicate()
     except (OSError, CalledProcessError):
         logging.debug('Error executing command')
