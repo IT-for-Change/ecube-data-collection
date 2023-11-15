@@ -12,7 +12,7 @@ from time import time
 import csv
 import traceback
 
-APP_VERSION = '2.0.0'
+APP_VERSION = '2.0.2'
 ECUBE_COLLECT_SCOPE_FULL = 'all'
 ECUBE_COLLECT_SCOPE_AUDIO = 'audio'
 ECUBE_COLLECT_DB = 'ell-collect.db'
@@ -201,7 +201,7 @@ def runProcess(cmd):
     
     try:
         logging.debug('Executing command "' + cmd + '"')
-        p = Popen(cmd, stdout=PIPE, stderr=PIPE, text='utf-8',shell=True)
+        p = Popen(cmd, stdout=PIPE, stderr=PIPE, encoding='utf-8',shell=True)
         out, err = p.communicate()
     except (OSError, CalledProcessError):
         logging.debug('Error executing command')
