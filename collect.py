@@ -12,7 +12,7 @@ from time import time
 import csv
 import traceback
 
-APP_VERSION = '2.0.2'
+APP_VERSION = '2.0.3'
 ECUBE_COLLECT_SCOPE_FULL = 'all'
 ECUBE_COLLECT_SCOPE_AUDIO = 'audio'
 ECUBE_COLLECT_DB = 'ell-collect.db'
