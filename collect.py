@@ -376,7 +376,7 @@ def collectMedia(collectConfig):
         sql =  '''select mdl_user.id, mdl_user.username , mdl_assign.course as course, mdl_assign.id as assignment_id, mdl_assign_submission.attemptnumber, mdl_assign_submission.timecreated, mdl_files.contenthash, mdl_files.pathnamehash 
                 from mdl_assign_submission
                 inner join mdl_assign on mdl_assign.id = mdl_assign_submission.`assignment`
-                inner join mdl_assignsubmission_onlinetext on mdl_assignsubmission_onlinetext.`assignment` = mdl_assign_submission.`assignment`
+                inner join mdl_assignsubmission_onlinetext on mdl_assignsubmission_onlinetext.submission = mdl_assign_submission.id
                 inner join mdl_user on mdl_user.id = mdl_assign_submission.userid
                 inner join mdl_files on mdl_files.itemid = mdl_assignsubmission_onlinetext.submission 
                 where mdl_assign_submission.status ='submitted' and (mdl_files.mimetype like 'audio%' or mdl_files.mimetype like 'video%');
